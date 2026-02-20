@@ -29,7 +29,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     // NEW: Force hide any frontend navbar
     const hideFrontendNavbar = () => {
       // Target the frontend navbar specifically
-      const frontendNavbar = document.querySelector("nav:first-of-type");
+      // Target the frontend navbar specifically
+      const frontendNavbar = document.querySelector(
+        "nav:first-of-type",
+      ) as HTMLElement | null;
       if (
         frontendNavbar &&
         !frontendNavbar.classList.contains("admin-sidebar")
