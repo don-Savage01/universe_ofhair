@@ -1,11 +1,13 @@
 "use client";
 
+import { Suspense } from "react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function CheckoutPage() {
+// Separate component that uses useSearchParams
+function CheckoutContent() {
   const searchParams = useSearchParams();
   const [paystackLoaded, setPaystackLoaded] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -817,5 +819,20 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Main export with Suspense boundary
+export default function CheckoutPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+        </div>
+      }
+    >
+      <CheckoutContent />
+    </Suspense>
   );
 }

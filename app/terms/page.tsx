@@ -1,10 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
-export default function TermsPage() {
+// Separate component that uses useSearchParams and useRouter
+function TermsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -132,5 +134,20 @@ export default function TermsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Main export with Suspense boundary
+export default function TermsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+        </div>
+      }
+    >
+      <TermsContent />
+    </Suspense>
   );
 }

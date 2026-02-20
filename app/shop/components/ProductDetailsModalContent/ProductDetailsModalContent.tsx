@@ -21,6 +21,7 @@ interface ProductDetailsModalContentProps {
 
 interface LengthOption {
   value: string;
+  label?: string;
   price: number;
   originalPrice?: number;
   laceSize?: string;
@@ -92,14 +93,27 @@ export default function ProductDetailsModalContent({
     if (!product.laceSizeOptions || product.laceSizeOptions.length === 0) {
       return [];
     }
-    return product.laceSizeOptions.map((option) => ({
-      value: option.value,
-      label: option.label || option.value,
-      priceMultiplier:
-        typeof option.priceMultiplier === "string"
-          ? parseFloat(option.priceMultiplier.replace(/,/g, "")) || 0
-          : Number(option.priceMultiplier) || 0,
-    }));
+    return product.laceSizeOptions.map((option: any) => {
+      // Handle priceMultiplier safely
+      let priceMultiplier = 0;
+
+      if (typeof option.priceMultiplier === "string") {
+        // Remove commas and parse as float
+        priceMultiplier =
+          parseFloat(option.priceMultiplier.replace(/,/g, "")) || 0;
+      } else if (typeof option.priceMultiplier === "number") {
+        priceMultiplier = option.priceMultiplier;
+      } else if (option.priceMultiplier) {
+        // Try to convert to number if it's something else
+        priceMultiplier = Number(option.priceMultiplier) || 0;
+      }
+
+      return {
+        value: option.value,
+        label: option.label || option.value,
+        priceMultiplier: priceMultiplier,
+      };
+    });
   }, [product.laceSizeOptions]);
 
   const densityOptions = useMemo(() => {
@@ -107,15 +121,25 @@ export default function ProductDetailsModalContent({
       return [];
     }
     return product.densityOptions
-      .map((opt) => {
+      .map((opt: any) => {
+        // Change this line to use `any`
         if (opt && typeof opt === "object" && "value" in opt) {
+          // Handle additionalPrice safely
+          let additionalPrice = 0;
+
+          if (typeof opt.additionalPrice === "string") {
+            additionalPrice =
+              parseFloat(opt.additionalPrice.replace(/,/g, "")) || 0;
+          } else if (typeof opt.additionalPrice === "number") {
+            additionalPrice = opt.additionalPrice;
+          } else if (opt.additionalPrice) {
+            additionalPrice = Number(opt.additionalPrice) || 0;
+          }
+
           return {
             value: opt.value,
             label: opt.label || opt.value,
-            additionalPrice:
-              typeof opt.additionalPrice === "string"
-                ? parseFloat(opt.additionalPrice.replace(/,/g, "")) || 0
-                : Number(opt.additionalPrice) || 0,
+            additionalPrice: additionalPrice,
             prices: opt.prices || [],
           };
         }
@@ -558,9 +582,9 @@ export default function ProductDetailsModalContent({
               selectedDensity={selectedDensity}
               selectedLaceSize={selectedLaceSize}
               isOutOfStock={isOutOfStock}
-              hasLengthOptions={hasLengthOptions}
+              hasLengthOptions={hasLengthOptions!}
               hasDensityOptions={hasDensityOptions}
-              hasLaceSizeOptions={hasLaceSizeOptions}
+              hasLaceSizeOptions={hasLaceSizeOptions!}
               lengthOptions={lengthOptions}
               densityOptions={densityOptions.map((opt) => opt.value)}
               laceSizeOptions={laceSizeOptions}

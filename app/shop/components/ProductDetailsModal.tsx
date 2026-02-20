@@ -116,9 +116,6 @@ export default function ProductDetailsModal({
           <ProductDetailsModalContent
             product={product}
             isInCart={isInCart}
-            cartQuantity={cartQuantity}
-            onUpdateCart={onUpdateCart}
-            onRemoveFromCart={onRemoveFromCart}
             onClose={onClose}
             onShowDeliveryModal={() => setShowDeliveryModal(true)}
             onShowRefundModal={() => setShowRefundModal(true)}

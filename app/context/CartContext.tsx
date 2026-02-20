@@ -37,6 +37,9 @@ interface CartItem {
   dealRightIcon?: string;
   dealRightTag?: string;
   taxNotice?: string;
+  laceLabel?: string;
+  shippingFee?: number;
+  deliveryText?: string;
 }
 
 interface ProductData {
@@ -282,6 +285,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
             dealRightIcon: item.dealRightIcon || "",
             dealRightTag: item.dealRightTag || "",
             taxNotice: item.taxNotice || "",
+            laceLabel: item.laceLabel || "",
+            shippingFee: item.shippingFee || 2500,
+            deliveryText: item.deliveryText || "Jan. 22 - Feb. 04",
             lastUpdated: Date.now(),
           },
         ];

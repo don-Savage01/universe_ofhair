@@ -64,7 +64,7 @@ export default function OptionSelectors({
                     disabled={isOutOfStock}
                   >
                     <div className="text-center font-sans font-medium">
-                      {option.label}
+                      {option.label || option.value}
                     </div>
                   </button>
                 ))}

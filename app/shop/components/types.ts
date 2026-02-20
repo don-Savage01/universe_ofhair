@@ -15,6 +15,10 @@ export interface Product {
   hairInfo: string;
   dealLeftText: string;
   dealRightText: string;
+  dealRightIcon?: string;
+  dealRightTag?: string;
+  dealLeftIcon?: string;
+  dealLeftTag?: string;
   taxNotice: string;
   lengthOptions?: LengthOption[];
   laceSizeOptions?: LaceSizeOption[];

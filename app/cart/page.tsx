@@ -10,11 +10,12 @@ import {
   TrashIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react"; // Add Suspense
+import { useRouter, useSearchParams } from "next/navigation"; // Fix this line
 import OptimizedImage from "@/app/shop/components/OptimizedImage";
 
-export default function CartPage() {
+// Create a separate component that uses useSearchParams
+function CartContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { products, loading: productsLoading } = useProducts();
@@ -292,7 +293,7 @@ export default function CartPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
       {/* Full Screen Modal for Product Details */}
       {selectedProduct && (
         <ProductDetailsModal
@@ -717,6 +718,21 @@ export default function CartPage() {
           </div>
         )}
       </main>
-    </div>
+    </>
+  );
+}
+
+// Main export with Suspense boundary
+export default function CartPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+        </div>
+      }
+    >
+      <CartContent />
+    </Suspense>
   );
 }

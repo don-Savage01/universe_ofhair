@@ -141,7 +141,7 @@ export default function ShopPage() {
   /* -------------------- ADD TO CART -------------------- */
   const handleAddToCart = (product: Product) => {
     addToCart({
-      id: product.id,
+      id: product.id.toString(),
       name: product.name,
       price: product.price,
       originalPrice: product.originalPrice,
