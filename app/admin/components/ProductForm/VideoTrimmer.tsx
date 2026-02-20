@@ -152,7 +152,6 @@ export default function VideoTrimmer({
         videoRef.current.pause();
       }
 
-      // Listen to FFmpeg logs to extract current time and calculate progress
       ffmpeg.on("log", ({ message }) => {
         const timeMatch = message.match(/time=(\d+):(\d+):(\d+\.?\d*)/);
         if (timeMatch) {
@@ -197,8 +196,8 @@ export default function VideoTrimmer({
 
       setTrimProgress(100);
 
-      // FIX: cast to Uint8Array so TypeScript is happy
-      const data = (await ffmpeg.readFile("output.mp4")) as Uint8Array;
+      const raw = await ffmpeg.readFile("output.mp4");
+      const data = new Uint8Array(raw as ArrayBufferLike);
       const trimmedBlob = new Blob([data], { type: "video/mp4" });
 
       resetVideoElement();
@@ -323,7 +322,6 @@ export default function VideoTrimmer({
                 Choose 60-Second Segment
               </h3>
 
-              {/* FFmpeg loading indicator */}
               {!ffmpegLoaded && !ffmpegLoadError && videoDuration > 60 && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4 flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin flex-shrink-0" />
