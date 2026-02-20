@@ -180,19 +180,19 @@ export default function ProductForm({
       }
 
       if (product.densityOptions && product.densityOptions.length > 0) {
+        // Check if the first item is a string to determine the format
         const firstOption = product.densityOptions[0];
+
         if (typeof firstOption === "string") {
-          const stringOptions = product.densityOptions as string[];
-          const convertedOptions = stringOptions.map(
-            (opt: string, index: number) => ({
-              value: opt,
-              label: opt,
-              additionalPrice: 0,
-              prices: [],
-            }),
-          );
+          const convertedOptions = product.densityOptions.map((opt: any) => ({
+            value: opt,
+            label: opt,
+            additionalPrice: 0,
+            prices: [],
+          }));
           setDensityOptions(convertedOptions);
         } else {
+          // Already in DensityOption format - use as is
           setDensityOptions(product.densityOptions as DensityOption[]);
         }
       } else {
