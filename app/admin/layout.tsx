@@ -14,11 +14,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Hide pink hamburger
+    // Hide pink hamburger
     const pinkTimer = setInterval(() => {
       document.querySelectorAll("*").forEach((el) => {
-        const bgColor = window.getComputedStyle(el).backgroundColor;
+        // Cast to HTMLElement to access style property
+        const element = el as HTMLElement;
+        const bgColor = window.getComputedStyle(element).backgroundColor;
         if (bgColor === "rgb(255, 66, 179)" || bgColor === "#ff42b3") {
-          el.style.display = "none";
+          element.style.display = "none";
         }
       });
     }, 500);
