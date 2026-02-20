@@ -11,31 +11,7 @@ import {
 } from "react";
 import { fetchProducts } from "@/lib/shop-fetch";
 import { supabase } from "@/lib/supabase";
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  images: string[];
-  description: string;
-  features: string[];
-  rating: number;
-  inStock: boolean;
-  category: string;
-  lastUpdated: number;
-  hairInfo?: string;
-  selectedLength?: string;
-  selectedDensity?: string;
-  selectedLaceSize?: string;
-  dealLeftText?: string;
-  dealLeftIcon?: string;
-  dealLeftTag?: string;
-  dealRightText?: string;
-  dealRightIcon?: string;
-  dealRightTag?: string;
-  taxNotice?: string;
-}
+import { Product } from "@/app/shop/components/types";
 
 interface ProductsContextType {
   products: Product[];
