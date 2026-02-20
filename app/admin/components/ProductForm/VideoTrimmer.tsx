@@ -197,10 +197,9 @@ export default function VideoTrimmer({
 
       setTrimProgress(100);
 
-      const data = await ffmpeg.readFile("output.mp4");
-      // FIX: Convert the data to a Uint8Array to fix TypeScript error
-      const dataArray = new Uint8Array(data as ArrayBuffer);
-      const trimmedBlob = new Blob([dataArray], { type: "video/mp4" });
+      // FIX: cast to Uint8Array so TypeScript is happy
+      const data = (await ffmpeg.readFile("output.mp4")) as Uint8Array;
+      const trimmedBlob = new Blob([data], { type: "video/mp4" });
 
       resetVideoElement();
       onTrimComplete(trimmedBlob);
