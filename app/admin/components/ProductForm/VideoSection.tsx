@@ -16,7 +16,7 @@ interface VideoSectionProps {
   setVideoPreview: (preview: string | null) => void;
   existingVideoUrl?: string;
   maxVideos?: number;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
   isClient: boolean;
   blobUrlsRef: React.RefObject<Set<string>>;
   triggerFileInput: () => void;
