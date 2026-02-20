@@ -21,6 +21,7 @@ interface VideoSectionProps {
   blobUrlsRef: React.RefObject<Set<string>>;
   triggerFileInput: () => void;
   onRemoveExistingVideo?: () => void;
+  productId?: string | null;
 }
 
 export default function VideoSection({
