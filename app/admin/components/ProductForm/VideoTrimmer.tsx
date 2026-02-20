@@ -197,7 +197,7 @@ export default function VideoTrimmer({
       setTrimProgress(100);
 
       const raw = await ffmpeg.readFile("output.mp4");
-      const data = new Uint8Array(raw as ArrayBufferLike);
+      const data = raw instanceof Uint8Array ? raw : new Uint8Array(raw as any);
       const trimmedBlob = new Blob([data], { type: "video/mp4" });
 
       resetVideoElement();
