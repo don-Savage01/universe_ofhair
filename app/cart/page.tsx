@@ -17,7 +17,7 @@ import OptimizedImage from "@/app/shop/components/OptimizedImage";
 export default function CartPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { products, isLoading: productsLoading } = useProducts();
+  const { products, loading: productsLoading } = useProducts();
   const {
     cart,
     cartCount,
