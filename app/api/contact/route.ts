@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
         Precedence: "bulk",
       },
       // Priority settings
-      priority: "high",
+      priority: "high" as const,
       html: `
         <!DOCTYPE html>
         <html>
