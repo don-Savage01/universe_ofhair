@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       message: data.message,
       reference: data.data?.reference,
       amount: data.data?.amount,
-      status: data.data?.status,
+      paymentStatus: data.data?.status,
     });
 
     if (data.status && data.data.status === "success") {
