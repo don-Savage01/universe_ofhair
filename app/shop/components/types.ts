@@ -93,6 +93,18 @@ export interface SupabaseProduct {
   features?: any;
 }
 
+export interface HeroSectionProps {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  isSearchFocused: boolean;
+  setIsSearchFocused: (focused: boolean) => void;
+  clearSearch: () => void;
+  selectedCategory: string;
+  setSelectedCategory: (category: string) => void;
+  categories: string[];
+  filteredProducts: any[];
+}
+
 function parseJsonField(field: any): any[] {
   if (field === null || field === undefined) return [];
   if (Array.isArray(field)) return field;
