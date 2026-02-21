@@ -11,6 +11,41 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 
+function triggerLoader() {
+  if (
+    typeof window !== "undefined" &&
+    typeof (window as any).__startNavLoader === "function"
+  ) {
+    (window as any).__startNavLoader();
+  }
+}
+
+function NavLink({
+  href,
+  className,
+  onClick,
+  children,
+}: {
+  href: string;
+  className?: string;
+  onClick?: () => void;
+  children: React.ReactNode;
+}) {
+  const pathname = usePathname();
+  const isSamePage = pathname === href;
+
+  const handleClick = () => {
+    if (!isSamePage) triggerLoader();
+    onClick?.();
+  };
+
+  return (
+    <Link href={href} className={className} onClick={handleClick}>
+      {children}
+    </Link>
+  );
+}
+
 export default function Navbar() {
   const pathname = usePathname();
   const isHome = pathname === "/";
@@ -19,7 +54,6 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ================= NAVBAR ================= */}
       <nav
         className={`z-50 ${
           isHome
@@ -28,32 +62,31 @@ export default function Navbar() {
         }`}
       >
         <div className="pl-4 lg:pl-8 pr-2 lg:pr-3">
-          {/* ================= MOBILE (HOME PAGE ONLY) ================= */}
+          {/* MOBILE - HOME */}
           {isHome && (
             <div className="md:hidden">
               <div className="flex flex-col items-center ml-3">
-                <Link href="/">
+                <NavLink href="/">
                   <span className="font-abyssinica text-3xl text-gray-700 font-bold block ml-1 mb-0">
                     HAIR
                   </span>
                   <span className="font-akronim text-4xl text-gray-700 font-bold block -ml-2">
                     Universe
                   </span>
-                </Link>
+                </NavLink>
               </div>
 
               <div className="border-t border-gray-500 w-full my-2" />
 
               <div className="flex items-center justify-between">
-                {/* Cart Icon - ONLY ON HOME PAGE */}
-                <Link href="/cart" className="relative">
+                <NavLink href="/cart" className="relative">
                   <ShoppingCartIcon className="w-8 h-10 text-gray-700" />
                   {cartCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                       {cartCount}
                     </span>
                   )}
-                </Link>
+                </NavLink>
 
                 <div className="flex-1 flex justify-center">
                   {isMenuOpen ? (
@@ -74,11 +107,11 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* ================= DESKTOP (HOME PAGE ONLY) ================= */}
+          {/* DESKTOP - HOME */}
           {isHome && (
             <div className="hidden md:block">
               <div className="flex justify-between items-start">
-                <Link href="/">
+                <NavLink href="/">
                   <div className="flex flex-col">
                     <span className="font-abyssinica text-3xl text-gray-700 font-bold">
                       HAIR
@@ -87,19 +120,18 @@ export default function Navbar() {
                       Universe
                     </span>
                   </div>
-                </Link>
+                </NavLink>
 
                 <div>
                   <div className="font-alkalami flex items-center space-x-1 pt-2 justify-end">
-                    {/* Cart Icon - ONLY ON HOME PAGE */}
-                    <Link href="/cart" className="relative">
+                    <NavLink href="/cart" className="relative">
                       <ShoppingBagIcon className="w-10 h-8.5 text-gray-700" />
                       {cartCount > 0 && (
                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                           {cartCount}
                         </span>
                       )}
-                    </Link>
+                    </NavLink>
                   </div>
                 </div>
               </div>
@@ -107,23 +139,22 @@ export default function Navbar() {
               <div className="flex justify-end mt-2">
                 <div className="flex space-x-2 text-gray-700">
                   {navLinks.map((link) => (
-                    <Link
+                    <NavLink
                       key={link.name}
                       href={link.href}
                       className="font-alkalami text-2xl uppercase px-2 py-1 hover:bg-black hover:text-white transition"
                     >
                       {link.name}
-                    </Link>
+                    </NavLink>
                   ))}
                 </div>
               </div>
             </div>
           )}
 
-          {/* ================= NON-HOME PAGES (MOBILE) ================= */}
+          {/* MOBILE - NON-HOME */}
           {!isHome && (
             <div className="md:hidden flex justify-end items-center space-x-4">
-              {/* NO CART ICON HERE - Only menu button */}
               {isMenuOpen ? (
                 <XMarkIcon
                   className="w-10 h-8 text-white cursor-pointer"
@@ -140,21 +171,20 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* ================= DESKTOP (NON-HOME PAGES) ================= */}
+          {/* DESKTOP - NON-HOME */}
           {!isHome && (
             <div className="hidden md:block">
               <div className="flex justify-end items-center pt-4 pr-2">
                 <div className="flex items-center space-x-8">
                   {navLinks.map((link) => (
-                    <Link
+                    <NavLink
                       key={link.name}
                       href={link.href}
                       className="font-alkalami text-base uppercase text-gray-500 hover:text-pink-300 transition duration-200"
                     >
                       {link.name}
-                    </Link>
+                    </NavLink>
                   ))}
-                  {/* NO CART ICON HERE */}
                 </div>
               </div>
             </div>
@@ -162,26 +192,25 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* ================= MOBILE MENU FOR HOME PAGE ================= */}
+      {/* MOBILE MENU - HOME */}
       {isMenuOpen && isHome && (
         <>
           <div
             className="fixed inset-0 bg-black/30 z-40 md:hidden"
             onClick={() => setIsMenuOpen(false)}
           />
-
           <div className="md:hidden">
             <div className="fixed top-10 right-0 h-1/2.5 w-2/7 bg-gray-500 text-stone-100 z-60 shadow-md rounded-bl-md">
               <div className="space-y-4 py-5 pl-1">
                 {navLinks.map((link) => (
-                  <Link
+                  <NavLink
                     key={link.name}
                     href={link.href}
                     onClick={() => setIsMenuOpen(false)}
                     className="block text-sm uppercase hover:bg-gray-700 hover:text-white px-2 py-1 rounded"
                   >
                     {link.name}
-                  </Link>
+                  </NavLink>
                 ))}
               </div>
             </div>
@@ -189,26 +218,25 @@ export default function Navbar() {
         </>
       )}
 
-      {/* ================= MOBILE MENU FOR NON-HOME PAGES ================= */}
+      {/* MOBILE MENU - NON-HOME */}
       {isMenuOpen && !isHome && (
         <>
           <div
             className="fixed inset-0 bg-black/30 z-40 md:hidden"
             onClick={() => setIsMenuOpen(false)}
           />
-
           <div className="md:hidden fixed top-[70px] left-0 right-0 w-full bg-white z-50 shadow-lg">
             <div className="p-5">
               <div className="space-y-4">
                 {navLinks.map((link) => (
-                  <Link
+                  <NavLink
                     key={link.name}
                     href={link.href}
                     onClick={() => setIsMenuOpen(false)}
                     className="block text-base uppercase text-gray-800 hover:text-pink-600 px-3 py-3 border-b border-gray-200 last:border-b-0 transition"
                   >
                     {link.name}
-                  </Link>
+                  </NavLink>
                 ))}
               </div>
             </div>
