@@ -180,7 +180,6 @@ export default function ProductForm({
       }
 
       if (product.densityOptions && product.densityOptions.length > 0) {
-        // Check if the first item is a string to determine the format
         const firstOption = product.densityOptions[0];
 
         if (typeof firstOption === "string") {
@@ -192,7 +191,6 @@ export default function ProductForm({
           }));
           setDensityOptions(convertedOptions);
         } else {
-          // Already in DensityOption format - use as is
           setDensityOptions(product.densityOptions as DensityOption[]);
         }
       } else {
@@ -297,8 +295,12 @@ export default function ProductForm({
     setUploadProgress(0);
 
     try {
+      // ✅ FIX: exclude data URLs and blob URLs from existing URLs
       const existingImageUrls = imagePreviews.filter(
-        (url) => !url.startsWith("blob:") && url.includes("http"),
+        (url) =>
+          !url.startsWith("blob:") &&
+          !url.startsWith("data:") &&
+          url.includes("http"),
       );
 
       if (existingImageUrls.length === 0 && imageFiles.length === 0) {
@@ -313,9 +315,9 @@ export default function ProductForm({
         const validImageFiles = filterValidFiles(imageFiles);
         if (validImageFiles.length > 0) {
           try {
-            setUploadProgress(20); // Started image upload
+            setUploadProgress(20);
             finalImageUrls = await uploadImagesToSupabase(validImageFiles);
-            setUploadProgress(50); // Images uploaded
+            setUploadProgress(50);
           } catch (uploadError) {
             if (uploadError instanceof Error) {
               const errorMessage = uploadError.message.toLowerCase();
@@ -342,7 +344,26 @@ export default function ProductForm({
         }
       }
 
-      const allImageUrls = [...existingImageUrls, ...finalImageUrls];
+      // ✅ FIX: Preserve thumbnail order by mapping imagePreviews in order
+      // Track which new file index we're on as we encounter non-http previews
+      let newFileIndex = 0;
+      const allImageUrls: string[] = imagePreviews
+        .map((preview) => {
+          if (
+            !preview.startsWith("blob:") &&
+            !preview.startsWith("data:") &&
+            preview.includes("http")
+          ) {
+            // It's an existing Supabase URL — keep it as-is
+            return preview;
+          } else {
+            // It's a newly uploaded file — map to the uploaded URL in order
+            const uploadedUrl = finalImageUrls[newFileIndex] || null;
+            newFileIndex++;
+            return uploadedUrl;
+          }
+        })
+        .filter(Boolean) as string[];
 
       if (allImageUrls.length === 0) {
         alert("No images available. Please upload at least one image!");
@@ -351,14 +372,14 @@ export default function ProductForm({
         return;
       }
 
-      setUploadProgress(60); // Images processed, starting video upload
+      setUploadProgress(60);
 
       let finalVideoUrl: string | undefined = undefined;
 
       if (videoFile) {
         try {
           finalVideoUrl = await uploadVideoToSupabase(videoFile);
-          setUploadProgress(80); // Video uploaded
+          setUploadProgress(80);
           if (existingVideoUrl && existingVideoUrl !== finalVideoUrl) {
             try {
               await deleteVideoFromSupabase(existingVideoUrl);
@@ -404,7 +425,7 @@ export default function ProductForm({
         finalVideoUrl = product.videoUrl;
       }
 
-      setUploadProgress(90); // Preparing product data
+      setUploadProgress(90);
 
       let basePrice = 0;
       let baseOriginalPrice = undefined;
@@ -451,7 +472,7 @@ export default function ProductForm({
         enableLengthOptions: enableLengthOptions,
       };
 
-      setUploadProgress(100); // Complete
+      setUploadProgress(100);
       onSubmit(productData);
     } catch (error) {
       alert(
