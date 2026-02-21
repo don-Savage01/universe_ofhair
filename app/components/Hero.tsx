@@ -30,14 +30,15 @@ export default function Hero() {
         </div>
 
         {/* Image container */}
-        <div className="relative w-full h-48 md:h-[50vh] order-1 md:order-2 mb-2 md:mb-0 md:w-[80%] md:-mr-10 ">
+        <div className="relative w-full h-48 md:h-[50vh] order-1 md:order-2 mb-2 md:mb-0 md:w-[80%] md:-mr-10">
           <Image
             src="/images/homepage.jpg"
             alt="Hair extension example"
             fill
             className="object-contain"
             priority
-            sizes="(max-width: 768px) 100vw, 70vw"
+            sizes="(max-width: 768px) 100vw, 80vw"
+            quality={85}
           />
         </div>
       </div>

@@ -124,7 +124,7 @@ export default function Footer() {
                 </a>
 
                 <a
-                  href="https://tiktok.com/@universe.of.hair"
+                  href="https://tiktok.com/@_hair_universe_"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-10 h-10 rounded-full bg-stone-600 hover:bg-pink-500 transition-colors"
@@ -140,7 +140,7 @@ export default function Footer() {
                 </a>
 
                 <a
-                  href="https://facebook.com/universe.of.hair"
+                  href="https://www.facebook.com/profile.php?id=61582512740609"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-10 h-10 rounded-full bg-stone-600 hover:bg-pink-500 transition-colors"
@@ -156,7 +156,7 @@ export default function Footer() {
                 </a>
 
                 <a
-                  href="https://instagram.com/universe.of.hair"
+                  href="https://www.instagram.com/_hair_universe1?igsh=MTlqeWkzcjA5NjlyYQ=="
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-10 h-10 rounded-full bg-stone-600 hover:bg-pink-500 transition-colors"
@@ -217,7 +217,7 @@ export default function Footer() {
                 </a>
 
                 <a
-                  href="https://tiktok.com/@universe.of.hair"
+                  href="https://tiktok.com/@_hair_universe_"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-10 h-10 rounded-full bg-stone-600 hover:bg-pink-500 transition-colors"
@@ -249,7 +249,7 @@ export default function Footer() {
                 </a>
 
                 <a
-                  href="https://www.instagram.com/universe_of_hair1?igsh=MTlqeWkzcjA5NjlyYQ=="
+                  href="https://www.instagram.com/_hair_universe1?igsh=MTlqeWkzcjA5NjlyYQ=="
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-10 h-10 rounded-full bg-stone-600 hover:bg-pink-500 transition-colors"

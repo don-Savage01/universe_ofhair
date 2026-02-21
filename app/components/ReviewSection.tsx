@@ -980,7 +980,7 @@ export default function ReviewSection() {
                   </a>
 
                   <a
-                    href="https://tiktok.com/@universe.of.hair"
+                    href="https://tiktok.com/@_hair_universe_"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center w-8 h-8 rounded-full bg-stone-700 hover:bg-gray-700 transition-colors"
@@ -1014,7 +1014,7 @@ export default function ReviewSection() {
                   </a>
 
                   <a
-                    href="https://www.instagram.com/universe_of_hair1?igsh=MTlqeWkzcjA5NjlyYQ=="
+                    href="https://www.instagram.com/_hair_universe1?igsh=MTlqeWkzcjA5NjlyYQ=="
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center w-8 h-8 rounded-full bg-stone-700 hover:bg-gray-700 transition-colors"
