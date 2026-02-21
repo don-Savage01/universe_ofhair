@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-// Initialize Resend with your API key
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: Number(process.env.EMAIL_PORT),
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
 
 export async function POST(request: NextRequest) {
   try {
     const { to, subject, html, from } = await request.json();
 
-    // Validate required fields
     if (!to || !subject || !html) {
       return NextResponse.json(
         { error: "Missing required fields: to, subject, html" },
@@ -16,27 +22,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("📧 Sending email via Resend:", { to, subject });
-
-    const { data, error } = await resend.emails.send({
-      from: from || "HAIR Universe <onboarding@resend.dev>",
-      to: to,
-      subject: subject,
-      html: html,
+    await transporter.sendMail({
+      from: from || `"HAIR Universe" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      html,
     });
 
-    if (error) {
-      console.error("❌ Resend error:", error);
-      return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 500 },
-      );
-    }
-
-    console.log("✅ Email sent successfully:", data);
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error("❌ Email sending error:", error);
+    console.error("Email sending error:", error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 },
