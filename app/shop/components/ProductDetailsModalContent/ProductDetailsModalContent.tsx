@@ -10,6 +10,21 @@ import ServiceCommitment from "./ServiceCommitment";
 import ActionButtons from "./ActionButtons";
 import RemoveConfirmModal from "./RemoveConfirmModal";
 
+// ✅ Inline delivery date calculator — no DB needed
+// Replace the function in both files with this:
+function calculateDeliveryDates(): string {
+  const today = new Date();
+  const start = new Date(today);
+  const end = new Date(today);
+  start.setDate(today.getDate() + 5);
+  end.setDate(today.getDate() + 7); // ✅ Changed from 10 to 7
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+  };
+  return `${start.toLocaleDateString("en-US", options)} - ${end.toLocaleDateString("en-US", options)}`;
+}
+
 interface ProductDetailsModalContentProps {
   product: Product;
   onClose: () => void;
@@ -94,20 +109,15 @@ export default function ProductDetailsModalContent({
       return [];
     }
     return product.laceSizeOptions.map((option: any) => {
-      // Handle priceMultiplier safely
       let priceMultiplier = 0;
-
       if (typeof option.priceMultiplier === "string") {
-        // Remove commas and parse as float
         priceMultiplier =
           parseFloat(option.priceMultiplier.replace(/,/g, "")) || 0;
       } else if (typeof option.priceMultiplier === "number") {
         priceMultiplier = option.priceMultiplier;
       } else if (option.priceMultiplier) {
-        // Try to convert to number if it's something else
         priceMultiplier = Number(option.priceMultiplier) || 0;
       }
-
       return {
         value: option.value,
         label: option.label || option.value,
@@ -122,11 +132,8 @@ export default function ProductDetailsModalContent({
     }
     return product.densityOptions
       .map((opt: any) => {
-        // Change this line to use `any`
         if (opt && typeof opt === "object" && "value" in opt) {
-          // Handle additionalPrice safely
           let additionalPrice = 0;
-
           if (typeof opt.additionalPrice === "string") {
             additionalPrice =
               parseFloat(opt.additionalPrice.replace(/,/g, "")) || 0;
@@ -135,7 +142,6 @@ export default function ProductDetailsModalContent({
           } else if (opt.additionalPrice) {
             additionalPrice = Number(opt.additionalPrice) || 0;
           }
-
           return {
             value: opt.value,
             label: opt.label || opt.value,
@@ -212,7 +218,6 @@ export default function ProductDetailsModalContent({
     return 0;
   }, [selectedLaceSize, laceSizeOptions, hasLaceSizeOptions]);
 
-  // ✅ FIXED: Returns the additional price for the selected density
   const getDensityPrice = useCallback(() => {
     if (
       !hasDensityOptions ||
@@ -221,26 +226,19 @@ export default function ProductDetailsModalContent({
     ) {
       return 0;
     }
-
     const selectedOption = densityOptions.find(
       (opt) => opt.value === selectedDensity,
     );
     if (!selectedOption) return 0;
-
-    // If it's the first density (base), return 0 (no additional price)
     if (selectedOption.value === densityOptions[0]?.value) {
       return 0;
     }
-
-    // If we have a price matrix and selected length
     if (
       selectedOption.prices &&
       selectedOption.prices.length > 0 &&
       selectedLength
     ) {
       const sel = selectedLength.toLowerCase();
-
-      // Find the matching price entry
       const matchingPrice = selectedOption.prices.find((p: any) => {
         const id = (p.lengthId || "").toLowerCase();
         const val = (p.lengthValue || "").toLowerCase();
@@ -253,19 +251,13 @@ export default function ProductDetailsModalContent({
           id === sel.replace("inches", "")
         );
       });
-
       if (matchingPrice) {
-        // Get the base price for this length
         const baseLengthPrice =
           lengthOptions.find((l) => l.value === selectedLength)?.price ||
           product.price;
-
-        // Return the DIFFERENCE (additional price)
         return matchingPrice.price - baseLengthPrice;
       }
     }
-
-    // Fallback to additionalPrice if no matrix match
     return selectedOption.additionalPrice || 0;
   }, [
     selectedDensity,
@@ -312,30 +304,21 @@ export default function ProductDetailsModalContent({
   useEffect(() => {
     if (!initialized) {
       const cartItem = findProductInCart(product.id);
-
       if (cartItem) {
         setCartItemId(cartItem.id);
         setCartItemQuantity(cartItem.quantity);
-
-        if (cartItem.selectedLength) {
-          setSelectedLength(cartItem.selectedLength);
-        }
-
+        if (cartItem.selectedLength) setSelectedLength(cartItem.selectedLength);
         if (cartItem.selectedLaceSize) {
           setSelectedLaceSize(cartItem.selectedLaceSize);
         } else if (hasLaceSizeOptions && laceSizeOptions.length > 0) {
           setSelectedLaceSize(laceSizeOptions[0].value);
         }
-
-        if (cartItem.selectedDensity) {
+        if (cartItem.selectedDensity)
           setSelectedDensity(cartItem.selectedDensity);
-        }
       }
-
       if (hasLengthOptions && lengthOptions.length > 0 && !selectedLength) {
         setSelectedLength(lengthOptions[0].value);
       }
-
       if (
         hasLaceSizeOptions &&
         laceSizeOptions.length > 0 &&
@@ -343,11 +326,9 @@ export default function ProductDetailsModalContent({
       ) {
         setSelectedLaceSize(laceSizeOptions[0].value);
       }
-
       if (hasDensityOptions && densityOptions.length > 0 && !selectedDensity) {
         setSelectedDensity(densityOptions[0].value);
       }
-
       setInitialized(true);
     }
   }, [
@@ -370,6 +351,7 @@ export default function ProductDetailsModalContent({
           ? product.id + `-${length}`
           : product.id.toString();
 
+      // ✅ Delivery date always calculated fresh at the moment of adding to cart
       addToCart({
         id: newCartItemId,
         name: `${product.name}${hasLengthOptions && length ? ` - ${length}` : ""}`,
@@ -394,7 +376,7 @@ export default function ProductDetailsModalContent({
         selectedDensity: selectedDensity,
         selectedLaceSize: selectedLaceSize,
         shippingFee: product.shippingFee || 2500,
-        deliveryText: product.deliveryText || "Jan. 22 - Feb. 04",
+        deliveryText: calculateDeliveryDates(), // ✅ Always fresh
       });
 
       setCartItemId(newCartItemId);
@@ -477,7 +459,7 @@ export default function ProductDetailsModalContent({
         price: getCurrentPrice().toString(),
         originalPrice: getCurrentOriginalPrice()?.toString() || "",
         shippingFee: (product.shippingFee || 2500).toString(),
-        deliveryText: product.deliveryText || "Jan. 22 - Feb. 04",
+        deliveryText: calculateDeliveryDates(), // ✅ Always fresh
         fullProductName: getFullProductName(),
       });
       if (discountPercentage > 0) {
@@ -487,12 +469,8 @@ export default function ProductDetailsModalContent({
     }
   };
 
-  const leftDealText = product.dealLeftText || "SUPER DEAL";
-  const rightDealText = product.dealRightText || "LIMITED OFFER";
-  const taxNotice =
-    product.taxNotice || "Tax excluded, add at checkout if applicable";
   const shippingFee = product.shippingFee || 2500;
-  const deliveryText = product.deliveryText || "Jan. 22 - Feb. 04";
+  const deliveryText = calculateDeliveryDates(); // ✅ Always fresh on every render
 
   const handleLengthSelect = (lengthValue: string) => {
     setSelectedLength(lengthValue);

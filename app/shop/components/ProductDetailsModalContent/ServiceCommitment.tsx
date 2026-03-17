@@ -1,5 +1,19 @@
 "use client";
 
+// ✅ Always fresh — calculated when customer views the product
+function calculateDeliveryDates(): string {
+  const today = new Date();
+  const start = new Date(today);
+  const end = new Date(today);
+  start.setDate(today.getDate() + 5);
+  end.setDate(today.getDate() + 7);
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+  };
+  return `${start.toLocaleDateString("en-US", options)} - ${end.toLocaleDateString("en-US", options)}`;
+}
+
 interface ServiceCommitmentProps {
   product: any;
   formatPrice: (price: number) => string;
@@ -16,7 +30,7 @@ export default function ServiceCommitment({
   onShowPrivacyModal,
 }: ServiceCommitmentProps) {
   const shippingFee = product.shippingFee || 2500;
-  const deliveryText = product.deliveryText || "Jan. 22 - Feb. 04";
+  const deliveryText = calculateDeliveryDates(); // ✅ Never from DB
 
   return (
     <div className="mb-5 -mx-4 sm:-mx-6 lg:-mx-8 ">

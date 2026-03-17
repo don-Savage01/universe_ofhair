@@ -1,6 +1,18 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+function calculateDeliveryDates(): string {
+  const today = new Date();
+  const start = new Date(today);
+  const end = new Date(today);
+  start.setDate(today.getDate() + 5);
+  end.setDate(today.getDate() + 7); // ✅ Changed from 10 to 7
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+  };
+  return `${start.toLocaleDateString("en-US", options)} - ${end.toLocaleDateString("en-US", options)}`;
+}
 
 interface ProductServiceModalsProps {
   showDeliveryModal: boolean;
@@ -9,7 +21,7 @@ interface ProductServiceModalsProps {
   onCloseDeliveryModal: () => void;
   onCloseRefundModal: () => void;
   onClosePrivacyModal: () => void;
-  product: any; // Add product prop
+  product: any;
 }
 
 export default function ProductServiceModals({
@@ -19,32 +31,27 @@ export default function ProductServiceModals({
   onCloseDeliveryModal,
   onCloseRefundModal,
   onClosePrivacyModal,
-  product, // Destructure product
+  product,
 }: ProductServiceModalsProps) {
   const deliveryModalRef = useRef<HTMLDivElement>(null);
   const refundModalRef = useRef<HTMLDivElement>(null);
   const privacyModalRef = useRef<HTMLDivElement>(null);
 
-  // Get shipping fee from product or default
   const shippingFee = product?.shippingFee || 2500;
-  const deliveryText = product?.deliveryText || "Jan. 22 - Feb. 04";
+  const deliveryText = calculateDeliveryDates(); // ✅ Always fresh — never from DB
 
-  // Format price function
   const formatPrice = (price: number) => {
     return `NGN ${price.toLocaleString()}`;
   };
 
-  // Add this to show overlay when any modal is open
   const showOverlay = showDeliveryModal || showRefundModal || showPrivacyModal;
 
-  // Close modal when clicking on overlay
   const handleOverlayClick = () => {
     if (showDeliveryModal) onCloseDeliveryModal();
     if (showRefundModal) onCloseRefundModal();
     if (showPrivacyModal) onClosePrivacyModal();
   };
 
-  // Close modal when pressing Escape key - FIXED: Added all dependencies
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -53,7 +60,6 @@ export default function ProductServiceModals({
         if (showPrivacyModal) onClosePrivacyModal();
       }
     };
-
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [
@@ -67,7 +73,6 @@ export default function ProductServiceModals({
 
   return (
     <>
-      {/* Dark tinted overlay - CLICKABLE to close modal */}
       {showOverlay && (
         <div
           className="fixed inset-0 z-60 bg-black/40 backdrop-blur-[1px] transition-opacity duration-300 cursor-pointer"
@@ -75,7 +80,6 @@ export default function ProductServiceModals({
         />
       )}
 
-      {/* Delivery Information Modal */}
       {showDeliveryModal && (
         <div
           ref={deliveryModalRef}
@@ -83,7 +87,6 @@ export default function ProductServiceModals({
           onClick={(e) => e.stopPropagation()}
         >
           <div className="p-0">
-            {/* Header with full width background */}
             <div className="px-4 py-3 bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-t-2xl">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-bold text-white">
@@ -167,7 +170,6 @@ export default function ProductServiceModals({
         </div>
       )}
 
-      {/* Return and Refund Policy Modal */}
       {showRefundModal && (
         <div
           ref={refundModalRef}
@@ -175,7 +177,6 @@ export default function ProductServiceModals({
           onClick={(e) => e.stopPropagation()}
         >
           <div className="p-0">
-            {/* Header with full width background */}
             <div className="px-4 py-3 bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-t-2xl">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-bold text-white">
@@ -302,7 +303,6 @@ export default function ProductServiceModals({
         </div>
       )}
 
-      {/* Security and Privacy Modal */}
       {showPrivacyModal && (
         <div
           ref={privacyModalRef}
@@ -310,7 +310,6 @@ export default function ProductServiceModals({
           onClick={(e) => e.stopPropagation()}
         >
           <div className="p-0">
-            {/* Header with full width background */}
             <div className="px-4 py-3 bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-t-2xl">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-bold text-white">
@@ -355,7 +354,6 @@ export default function ProductServiceModals({
                   <h4 className="text-md font-medium text-gray-800 mb-1">
                     Secure Payment
                   </h4>
-
                   <p className="flex items-start">
                     <svg
                       className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0"
