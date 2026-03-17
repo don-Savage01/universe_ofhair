@@ -1,11 +1,11 @@
-import { calculateDeliveryDates } from "./utils";
+"use client";
 
 interface ShippingSectionProps {
   formData: {
     shippingFee: string;
   };
   handleChange: (
-    e: React.ChangeEvent
+    e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >,
   ) => void;
@@ -37,7 +37,8 @@ export default function ShippingSection({
             Delivery Dates
           </label>
           <p className="text-sm text-gray-500 mt-2">
-            Auto-calculated for customers at the time they view the product. Always shows 5–10 days from today.
+            Auto-calculated for customers at the time they view the product.
+            Always shows 5-7 days from today.
           </p>
         </div>
       </div>
