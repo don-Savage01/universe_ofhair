@@ -26,7 +26,7 @@ export default function AdminSidebar() {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col h-screen overflow-y-auto">
       {/* Header */}
       <div className="p-6 flex-shrink-0">
         <h1 className="text-xl font-bold text-gray-800">Hair Universe</h1>
