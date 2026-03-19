@@ -56,7 +56,7 @@ export default function AdminSidebar() {
       </div>
 
       {/* Logout Button - Pushed to footer */}
-      <div className="mt-auto p-6 border-t border-gray-200 mb-12">
+      <div className="mt-auto p-4 border-t border-gray-200 mb-18">
         <button
           onClick={handleLogout}
           className="flex items-center justify-center w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors group"
