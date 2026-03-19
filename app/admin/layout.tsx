@@ -117,7 +117,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-gray-50 flex admin-layout">
       {/* Desktop Sidebar */}
       <div
-        className={`lg:block w-64 min-h-screen bg-white border-r border-gray-200 fixed lg:static z-50 transform transition-transform duration-300 ${
+        className={`lg:block w-64 h-screen bg-white border-r border-gray-200 fixed lg:static z-50 transform transition-transform duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >

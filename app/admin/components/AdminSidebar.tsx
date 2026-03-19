@@ -26,15 +26,15 @@ export default function AdminSidebar() {
   };
 
   return (
-    <div className="h-full flex flex-col h-screen max-h-screen overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="p-6 flex-shrink-0">
         <h1 className="text-xl font-bold text-gray-800">Hair Universe</h1>
         <p className="text-gray-500 text-sm">Admin Panel</p>
       </div>
 
-      {/* Navigation Menu - scrollable if needed */}
-      <div className="flex-1 overflow-y-auto px-4 py-2 min-h-0">
+      {/* Navigation Menu */}
+      <div className="px-4 py-2">
         {menuItems.map((item) => {
           const isActive =
             pathname === item.href || pathname?.startsWith(item.href + "/");
@@ -55,8 +55,8 @@ export default function AdminSidebar() {
         })}
       </div>
 
-      {/* Logout Button - Fixed at bottom */}
-      <div className="p-6 border-t border-gray-200 flex-shrink-0">
+      {/* Logout Button - Pushed to footer */}
+      <div className="mt-auto p-6 border-t border-gray-200">
         <button
           onClick={handleLogout}
           className="flex items-center justify-center w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors group"
