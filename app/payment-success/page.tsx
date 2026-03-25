@@ -5,6 +5,18 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
+function calculateDeliveryDates(): string {
+  const today = new Date();
+  const start = new Date(today);
+  const end = new Date(today);
+  start.setDate(today.getDate() + 2);
+  end.setDate(today.getDate() + 7);
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+  };
+  return `${start.toLocaleDateString("en-US", options)} - ${end.toLocaleDateString("en-US", options)}`;
+}
 // Separate component that uses useSearchParams
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -59,7 +71,8 @@ function PaymentSuccessContent() {
                 orderId: orderData.orderReference,
                 quantity: orderData.quantity || 1,
                 shippingFee: orderData.shippingFee,
-                deliveryText: orderData.deliveryText || "Jan. 22 - Feb. 04",
+                deliveryText:
+                  orderData.deliveryText || calculateDeliveryDates(),
 
                 productDetails: {
                   name: orderData.productName || "Cart Order",

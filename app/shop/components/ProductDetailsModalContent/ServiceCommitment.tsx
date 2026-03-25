@@ -5,8 +5,8 @@ function calculateDeliveryDates(): string {
   const today = new Date();
   const start = new Date(today);
   const end = new Date(today);
-  start.setDate(today.getDate() + 5);
-  end.setDate(today.getDate() + 7);
+  start.setDate(today.getDate() + 2); // ✅ Start 2 days from now
+  end.setDate(today.getDate() + 7); // ✅ End 7 days from now
   const options: Intl.DateTimeFormatOptions = {
     month: "short",
     day: "numeric",

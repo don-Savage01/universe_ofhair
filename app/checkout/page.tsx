@@ -6,6 +6,20 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
+// ✅ Always fresh — calculated when customer visits checkout
+function calculateDeliveryDates(): string {
+  const today = new Date();
+  const start = new Date(today);
+  const end = new Date(today);
+  start.setDate(today.getDate() + 2);
+  end.setDate(today.getDate() + 7);
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+  };
+  return `${start.toLocaleDateString("en-US", options)} - ${end.toLocaleDateString("en-US", options)}`;
+}
+
 // Separate component that uses useSearchParams
 function CheckoutContent() {
   const searchParams = useSearchParams();
@@ -27,7 +41,6 @@ function CheckoutContent() {
   const [phoneError, setPhoneError] = useState("");
   const [locationError, setLocationError] = useState("");
 
-  // ✅ FIX: Store and restore ALL product data from sessionStorage
   const [productData, setProductData] = useState({
     productId: "",
     productName: "",
@@ -41,24 +54,23 @@ function CheckoutContent() {
     originalPrice: null as number | null,
     discount: 0,
     shippingFee: 2500,
-    deliveryText: "Jan. 22 - Feb. 04",
+    deliveryText: calculateDeliveryDates(), // ✅ Always fresh
     fullProductName: "",
   });
 
-  // ✅ CRITICAL FIX: Save and restore ALL checkout data
   useEffect(() => {
-    // Check if we're on checkout page but have no params (coming back from Terms/Privacy)
     const hasParams = searchParams.get("productId");
 
     if (!hasParams) {
-      // Try to restore from sessionStorage
       const savedData = sessionStorage.getItem("checkoutProductData");
       if (savedData) {
         const parsed = JSON.parse(savedData);
-        setProductData(parsed);
+        setProductData({
+          ...parsed,
+          deliveryText: calculateDeliveryDates(), // ✅ Always fresh even when restored
+        });
         setIsRestored(true);
 
-        // Restore URL params (optional - for sharing)
         const urlParams = new URLSearchParams();
         Object.entries(parsed).forEach(([key, value]) => {
           if (value) urlParams.set(key, value as string);
@@ -70,7 +82,6 @@ function CheckoutContent() {
         );
       }
     } else {
-      // We have params, load from URL
       const newProductData = {
         productId: searchParams.get("productId") || "",
         productName: searchParams.get("productName") || "",
@@ -88,7 +99,7 @@ function CheckoutContent() {
           ? parseInt(searchParams.get("discount")!)
           : 0,
         shippingFee: parseFloat(searchParams.get("shippingFee") || "2500"),
-        deliveryText: searchParams.get("deliveryText") || "Jan. 22 - Feb. 04",
+        deliveryText: calculateDeliveryDates(), // ✅ Always fresh, never from URL
         fullProductName:
           searchParams.get("fullProductName") ||
           searchParams.get("productName") ||
@@ -98,7 +109,6 @@ function CheckoutContent() {
       setProductData(newProductData);
       setIsRestored(true);
 
-      // Save to sessionStorage for future navigation
       sessionStorage.setItem(
         "checkoutProductData",
         JSON.stringify(newProductData),
@@ -180,34 +190,29 @@ function CheckoutContent() {
 
     if (!isValid) {
       if (localFirstNameError) {
-        document.getElementById("first-name-field")?.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
+        document
+          .getElementById("first-name-field")
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
         document.getElementById("first-name-field")?.focus();
       } else if (localLastNameError) {
-        document.getElementById("last-name-field")?.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
+        document
+          .getElementById("last-name-field")
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
         document.getElementById("last-name-field")?.focus();
       } else if (localEmailError) {
-        document.getElementById("email-field")?.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
+        document
+          .getElementById("email-field")
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
         document.getElementById("email-field")?.focus();
       } else if (localPhoneError) {
-        document.getElementById("phone-field")?.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
+        document
+          .getElementById("phone-field")
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
         document.getElementById("phone-field")?.focus();
       } else if (localLocationError) {
-        document.getElementById("location-field")?.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
+        document
+          .getElementById("location-field")
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
         document.getElementById("location-field")?.focus();
       }
     }
@@ -215,18 +220,12 @@ function CheckoutContent() {
     return isValid;
   };
 
-  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
+    if (!validateForm()) return;
     handlePaymentRedirect();
   };
 
-  // Load Paystack script
   useEffect(() => {
     if ((window as any).PaystackPop) {
       setPaystackLoaded(true);
@@ -236,36 +235,27 @@ function CheckoutContent() {
     const script = document.createElement("script");
     script.src = "https://js.paystack.co/v1/inline.js";
     script.async = true;
-    script.onload = () => {
-      setPaystackLoaded(true);
-    };
+    script.onload = () => setPaystackLoaded(true);
     document.body.appendChild(script);
 
     return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
+      if (document.body.contains(script)) document.body.removeChild(script);
     };
   }, []);
 
-  // Reset processing state when component unmounts
   useEffect(() => {
-    return () => {
-      setProcessing(false);
-    };
+    return () => setProcessing(false);
   }, []);
 
-  // Handle payment redirect
   const handlePaymentRedirect = async () => {
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setProcessing(true);
 
     try {
       const orderReference = `HAIR-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
       const fullName = `${firstName} ${lastName}`.trim();
+      const freshDeliveryText = calculateDeliveryDates(); // ✅ Fresh at payment time
 
       const metadata = {
         customer_name: fullName || "Valued Customer",
@@ -283,7 +273,7 @@ function CheckoutContent() {
         item_price: productData.price,
         item_total: itemTotal,
         shipping_fee: productData.shippingFee,
-        delivery_text: productData.deliveryText,
+        delivery_text: freshDeliveryText,
         total_amount: totalAmount,
         discount: productData.discount || 0,
         original_price: productData.originalPrice || productData.price,
@@ -292,9 +282,7 @@ function CheckoutContent() {
 
       const response = await fetch("/api/initialize-paystack", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
           amount: Math.round(totalAmount * 100),
@@ -315,7 +303,7 @@ function CheckoutContent() {
             price: productData.price,
             quantity: productData.quantity,
             shippingFee: productData.shippingFee,
-            deliveryText: productData.deliveryText,
+            deliveryText: freshDeliveryText, // ✅ Fresh at payment time
             totalAmount,
             selectedLength: productData.selectedLength,
             selectedDensity: productData.selectedDensity,
@@ -339,7 +327,6 @@ function CheckoutContent() {
     }
   };
 
-  // Don't render until restored
   if (!isRestored) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -361,7 +348,6 @@ function CheckoutContent() {
               </h2>
 
               <div className="flex flex-col items-center">
-                {/* Product Image - Centered - NOW FROM SESSION STORAGE! */}
                 <div className="w-48 h-48 bg-gray-100 rounded-xl overflow-hidden mb-6 shadow-md">
                   {productData.productImage ? (
                     <Image
@@ -397,7 +383,6 @@ function CheckoutContent() {
                   {productData.productName}
                 </h3>
 
-                {/* Product Details Grid */}
                 <div className="w-full max-w-md bg-gray-50 rounded-sm p-5">
                   <div className="space-y-3">
                     {productData.selectedLength && (
@@ -496,11 +481,7 @@ function CheckoutContent() {
                         setFirstName(e.target.value);
                         setFirstNameError("");
                       }}
-                      className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition ${
-                        firstNameError
-                          ? "border-red-500 bg-red-50"
-                          : "border-gray-300"
-                      }`}
+                      className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition ${firstNameError ? "border-red-500 bg-red-50" : "border-gray-300"}`}
                       placeholder="First Name"
                     />
                     {firstNameError && (
@@ -534,11 +515,7 @@ function CheckoutContent() {
                         setLastName(e.target.value);
                         setLastNameError("");
                       }}
-                      className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition ${
-                        lastNameError
-                          ? "border-red-500 bg-red-50"
-                          : "border-gray-300"
-                      }`}
+                      className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition ${lastNameError ? "border-red-500 bg-red-50" : "border-gray-300"}`}
                       placeholder="Last Name"
                     />
                     {lastNameError && (
@@ -573,11 +550,7 @@ function CheckoutContent() {
                       setEmail(e.target.value);
                       setEmailError("");
                     }}
-                    className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition ${
-                      emailError
-                        ? "border-red-500 bg-red-50"
-                        : "border-gray-300"
-                    }`}
+                    className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition ${emailError ? "border-red-500 bg-red-50" : "border-gray-300"}`}
                     placeholder="you@example.com"
                   />
                   {emailError && (
@@ -611,11 +584,7 @@ function CheckoutContent() {
                       setPhone(e.target.value);
                       setPhoneError("");
                     }}
-                    className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition ${
-                      phoneError
-                        ? "border-red-500 bg-red-50"
-                        : "border-gray-300"
-                    }`}
+                    className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition ${phoneError ? "border-red-500 bg-red-50" : "border-gray-300"}`}
                     placeholder="08012222222"
                   />
                   {phoneError && (
@@ -649,11 +618,7 @@ function CheckoutContent() {
                       setLocationError("");
                     }}
                     rows={3}
-                    className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition resize-none ${
-                      locationError
-                        ? "border-red-500 bg-red-50"
-                        : "border-gray-300"
-                    }`}
+                    className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition resize-none ${locationError ? "border-red-500 bg-red-50" : "border-gray-300"}`}
                     placeholder="Enter your full delivery address (street, city, state)"
                   />
                   {locationError && (
@@ -704,7 +669,7 @@ function CheckoutContent() {
                       Standard Shipping
                     </p>
                     <p className="text-sm text-gray-600 mt-1">
-                      {productData.deliveryText}
+                      {productData.deliveryText} {/* ✅ Always fresh */}
                     </p>
                   </div>
                   <span className="font-bold text-gray-900 text-xs">
